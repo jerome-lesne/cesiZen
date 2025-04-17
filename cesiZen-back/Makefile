@@ -6,3 +6,10 @@ debug:
 
 clean:
 	./mvnw clean
+
+test:
+	./mvnw test
+
+run-test: test
+	./mvnw spring-boot:run
+
