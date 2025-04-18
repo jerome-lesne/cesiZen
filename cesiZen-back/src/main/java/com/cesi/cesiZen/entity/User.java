@@ -1,5 +1,7 @@
 package com.cesi.cesiZen.entity;
 
+import java.time.LocalDate;
+import org.springframework.format.annotation.DateTimeFormat;
 import jakarta.persistence.*;
 
 @Entity
@@ -11,8 +13,21 @@ public class User {
     private Long id;
     @Column
     private String name;
+    @Column(name = "first_name")
+    private String firstName;
     @Column
-    private String first_name;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate birthday;
+    @Column
+    private String address;
+    @Column
+    private int zipCode;
+    @Column
+    private String city;
+    @Column
+    private String mail;
+    @Column
+    private String password;
 
     public User() {
     }
@@ -38,12 +53,52 @@ public class User {
         this.name = name;
     }
 
-    public String getFirst_name() {
-        return first_name;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setFirst_name(String first_name) {
-        this.first_name = first_name;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public LocalDate getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(LocalDate birthday) {
+        this.birthday = birthday;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public int getZipCode() {
+        return zipCode;
+    }
+
+    public void setZipCode(int zipCode) {
+        this.zipCode = zipCode;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getMail() {
+        return mail;
+    }
+
+    public void setMail(String mail) {
+        this.mail = mail;
     }
 
 }

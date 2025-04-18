@@ -3,6 +3,8 @@ package com.cesi.cesiZen.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +27,34 @@ class UserServiceImplTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+    }
+
+    @Test
+    void testFindAll_UsersExists() {
+        // Given
+        ArrayList<User> users = new ArrayList<>();
+        User user1 = new User();
+        user1.setId(1L);
+        user1.setName("user1");
+
+        User user2 = new User();
+        user2.setId(2L);
+        user2.setName("user2");
+
+        users.add(user1);
+        users.add(user2);
+
+        when(userRepository.findAll()).thenReturn(users);
+
+        // When
+        List<User> foundUsers = userService.findAll();
+
+        // Then
+        assertNotNull(foundUsers);
+        assertEquals(users.get(0).getId(), foundUsers.get(0).getId());
+        assertEquals("user1", foundUsers.get(0).getName());
+        assertEquals("user2", foundUsers.get(1).getName());
+
     }
 
     @Test
