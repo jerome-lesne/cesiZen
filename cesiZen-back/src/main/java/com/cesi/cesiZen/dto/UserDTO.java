@@ -1,60 +1,34 @@
-package com.cesi.cesiZen.entity;
+package com.cesi.cesiZen.dto;
 
 import java.time.LocalDate;
-import java.util.List;
-
 import org.springframework.format.annotation.DateTimeFormat;
-import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 
-@Entity
-@Table(name = "user")
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
-    private Long id;
-    @Column
+public class UserDTO {
+    @NotBlank(message = "User name required")
     private String name;
-    @Column(name = "first_name")
+
+    @NotBlank(message = "User first name required")
     private String firstName;
-    @Column
+
+    @Past(message = "Birthday must be in the past")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthday;
-    @Column
+
+    @NotBlank(message = "Adress is required")
     private String address;
-    @Column
+
+    @Pattern(regexp = "^\\d{5}$", message = "Zip code must be exactly 5 digits")
     private int zipCode;
-    @Column
+
+    @NotBlank(message = "City is required")
     private String city;
-    @Column
+
+    @Email(message = "invalid email format")
     private String mail;
-    @Column
+
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^\\w\\s]).{12,}$", message = "Password must be at least 12 characters long, with at least one lowercase letter, one uppercase letter, one digit, and one special character")
     private String password;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserRole> userRoles;
-
-    public User() {
-    }
-
-    public User(String name, String firstName, LocalDate birthday, String address, int zipCode, String city,
-            String mail) {
-        this.name = name;
-        this.firstName = firstName;
-        this.birthday = birthday;
-        this.address = address;
-        this.zipCode = zipCode;
-        this.city = city;
-        this.mail = mail;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;
@@ -118,14 +92,6 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public List<UserRole> getUserRoles() {
-        return userRoles;
-    }
-
-    public void setUserRoles(List<UserRole> userRoles) {
-        this.userRoles = userRoles;
     }
 
 }
