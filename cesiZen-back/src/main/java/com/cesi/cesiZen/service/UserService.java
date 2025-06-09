@@ -3,6 +3,7 @@ package com.cesi.cesiZen.service;
 import java.util.List;
 
 import com.cesi.cesiZen.dto.UserDTO;
+import com.cesi.cesiZen.dto.UserUpdateProfileDTO;
 import com.cesi.cesiZen.entity.User;
 
 public interface UserService {
@@ -15,7 +16,9 @@ public interface UserService {
 
     User save(User user);
 
-    User update(Long id, UserDTO dto);
-
     void delete(Long id);
+
+    User partialUpdate(Long id, UserUpdateProfileDTO dto);
+
+    void updatePassword(Long id, String password);
 }

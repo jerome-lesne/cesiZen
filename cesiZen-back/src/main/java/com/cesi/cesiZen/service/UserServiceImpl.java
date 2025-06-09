@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.cesi.cesiZen.dto.UserDTO;
+import com.cesi.cesiZen.dto.UserUpdateProfileDTO;
 import com.cesi.cesiZen.entity.User;
 import com.cesi.cesiZen.repository.UserRepository;
 
@@ -52,32 +53,45 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User update(Long id, UserDTO dto) {
-        Optional<User> optionalUser = userRepository.findById(id);
-
-        if (optionalUser.isEmpty()) {
-            throw new IllegalArgumentException("User with id " + id + " not found.");
-        }
-
-        User user = optionalUser.get();
-        user.setFirstName(dto.getFirstName());
-        user.setName(dto.getName());
-        user.setBirthday(dto.getBirthday());
-        user.setMail(dto.getMail());
-        user.setAddress(dto.getAddress());
-        user.setZipCode(dto.getZipCode());
-        user.setCity(dto.getCity());
-
-        return userRepository.save(user);
-    }
-
-    @Override
     public void delete(Long id) {
         if (!userRepository.existsById(id)) {
             throw new IllegalArgumentException("User with id " + id + " not found.");
         }
 
         userRepository.deleteById(id);
+    }
+
+    @Override
+    public User partialUpdate(Long id, UserUpdateProfileDTO dto) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        if (dto.getName() != null)
+            user.setName(dto.getName());
+        if (dto.getFirstName() != null)
+            user.setFirstName(dto.getFirstName());
+        if (dto.getBirthday() != null)
+            user.setBirthday(dto.getBirthday());
+        if (dto.getAddress() != null)
+            user.setAddress(dto.getAddress());
+        if (dto.getZipCode() != null)
+            user.setZipCode(dto.getZipCode());
+        if (dto.getCity() != null)
+            user.setCity(dto.getCity());
+        if (dto.getMail() != null)
+            user.setMail(dto.getMail());
+
+        return userRepository.save(user);
+    }
+
+    @Override
+    public void updatePassword(Long id, String newPassword) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        String encodedPassword = passwordEncoder.encode(newPassword);
+        user.setPassword(encodedPassword);
+        userRepository.save(user);
     }
 
 }
