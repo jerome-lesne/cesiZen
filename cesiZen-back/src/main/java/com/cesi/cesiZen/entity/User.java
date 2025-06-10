@@ -2,6 +2,7 @@ package com.cesi.cesiZen.entity;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import jakarta.persistence.*;
@@ -32,7 +33,7 @@ public class User {
     private String password;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserRole> userRoles;
+    private Set<UserRole> userRoles;
 
     public User() {
     }
@@ -120,11 +121,11 @@ public class User {
         this.password = password;
     }
 
-    public List<UserRole> getUserRoles() {
+    public Set<UserRole> getUserRoles() {
         return userRoles;
     }
 
-    public void setUserRoles(List<UserRole> userRoles) {
+    public void setUserRoles(Set<UserRole> userRoles) {
         this.userRoles = userRoles;
     }
 
