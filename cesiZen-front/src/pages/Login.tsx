@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -6,6 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Mail, Lock } from "lucide-react";
 
 export default function LoginPage() {
+    const navigate = useNavigate();
     const { login } = useAuth();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -20,7 +22,7 @@ export default function LoginPage() {
         try {
             await login(email, password);
             console.log("connecté")
-            // TODO: redirection
+            navigate("/")
         } catch (err) {
             setError("Identifiants invalides");
         } finally {

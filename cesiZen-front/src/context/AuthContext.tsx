@@ -1,14 +1,15 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 type User = {
     id: number;
-    email: string;
+    firstName: string;
+    name: string;
+    mail: string;
     roles: string[];
 };
 
 type AuthContextType = {
     user: User | null;
-    token: string | null;
     login: (mail: string, password: string) => Promise<void>;
     logout: () => void;
     isAuthenticated: boolean;
@@ -17,42 +18,61 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-    const [token, setToken] = useState<string | null>(() => localStorage.getItem("token"));
-    const [user, setUser] = useState<User | null>(() => {
-        const storedUser = localStorage.getItem("user");
-        return storedUser ? JSON.parse(storedUser) : null;
-    });
+    const [user, setUser] = useState<User | null>(null);
+    const [loading, setLoading] = useState(true);
+    const isAuthenticated = !!user;
 
-    const isAuthenticated = !!token;
+    // Check if already logged in (cookie exists)
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const response = await fetch("http://localhost:8081/auth/me", {
+                    credentials: "include",
+                });
+                if (response.ok) {
+                    const userData = await response.json();
+                    setUser(userData);
+                }
+            } catch (error) {
+                console.error("Error fetching user profile:", error);
+            } finally {
+                setLoading(false)
+            }
+        };
+
+        fetchProfile();
+    }, []);
 
     const login = async (mail: string, password: string) => {
         const response = await fetch("http://localhost:8081/auth/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ mail, password }),
+            credentials: "include", // send and receive cookies
         });
 
         if (!response.ok) throw new Error("Authentication failed");
 
-        const data = await response.json();
-        const { token, userId, email, roles } = data;
+        const userResponse = await fetch("http://localhost:8081/auth/me", {
+            credentials: "include",
+        });
 
-        setToken(token);
-        setUser({ id: userId, email: email, roles });
+        if (!userResponse.ok) throw new Error("Failed to fetch user data after login");
 
-        localStorage.setItem("token", token);
-        localStorage.setItem("user", JSON.stringify({ id: userId, email: mail, roles }));
+        const userData = await userResponse.json();
+        setUser(userData);
     };
 
-    const logout = () => {
-        setToken(null);
+    const logout = async () => {
+        await fetch("http://localhost:8081/auth/logout", {
+            method: "POST",
+            credentials: "include",
+        });
         setUser(null);
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
     };
 
     return (
-        <AuthContext.Provider value={{ user, token, login, logout, isAuthenticated }}>
+        <AuthContext.Provider value={{ user, login, logout, isAuthenticated }}>
             {children}
         </AuthContext.Provider>
     );

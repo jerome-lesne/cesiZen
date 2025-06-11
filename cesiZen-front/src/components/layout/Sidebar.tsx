@@ -1,6 +1,6 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Home, UserPlus, UserPenIcon, LogIn } from "lucide-react";
+import { Home, UserPlus, UserPenIcon, LogIn, LogOut } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 type Props = {
@@ -9,7 +9,8 @@ type Props = {
 
 export default function Sidebar({ isMobile = false }: Props) {
     const location = useLocation();
-    const { isAuthenticated } = useAuth()
+    const navigate = useNavigate();
+    const { isAuthenticated, logout } = useAuth();
 
     const navItems = [
         { href: "/", label: "Acceuil", icon: Home },
@@ -19,6 +20,12 @@ export default function Sidebar({ isMobile = false }: Props) {
     const authNavItems = [
         { href: "/user-profile", label: "Profile", icon: UserPenIcon },
     ]
+
+    const handleLogout = async () => {
+        await logout();
+        navigate("/login");
+    };
+
     return (
         <aside
             className={`h-full flex flex-col space-y-4 p-4 ${isMobile ? "" : "w-64 bg-gray-900 text-white hidden md:flex"
@@ -42,17 +49,27 @@ export default function Sidebar({ isMobile = false }: Props) {
                 </div>
                 <div>
                     {isAuthenticated && authNavItems.map(({ href, label, icon: Icon }) => (
-                        <Link
-                            key={href}
-                            to={href}
-                            className={cn(
-                                "flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-muted-foreground/10 transition",
-                                location.pathname === href && "bg-muted-foreground/10 font-medium"
-                            )}
-                        >
-                            <Icon className="w-5 h-5" />
-                            {label}
-                        </Link>
+                        <>
+                            <Link
+                                key={href}
+                                to={href}
+                                className={cn(
+                                    "flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-muted-foreground/10 transition",
+                                    location.pathname === href && "bg-muted-foreground/10 font-medium"
+                                )}
+                            >
+                                <Icon className="w-5 h-5" />
+                                {label}
+                            </Link>
+                            <button
+                                onClick={handleLogout}
+                                className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-muted-foreground/10 transition text-left"
+                            >
+                                <LogOut className="w-5 h-5" />
+                                Se Déconnecter
+                            </button>
+                        </>
+
                     ))}
                 </div>
             </nav>
