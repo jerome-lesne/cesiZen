@@ -15,6 +15,7 @@ import com.cesi.cesiZen.repository.UserRepository;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -33,25 +34,30 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        final String authHeader = request.getHeader("Authorization");
+        String token = null;
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
-
-            if (jwtUtil.validateToken(token)) {
-                String email = jwtUtil.extractEmail(token);
-                User user = userRepository.findByMail(email).orElse(null);
-
-                if (user != null) {
-                    List<SimpleGrantedAuthority> authorities = user.getUserRoles().stream()
-                            .map(ur -> new SimpleGrantedAuthority("ROLE_" + ur.getRole().getName()))
-                            .collect(Collectors.toList());
-
-                    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(email, null,
-                            authorities);
-
-                    SecurityContextHolder.getContext().setAuthentication(auth);
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("jwt".equals(cookie.getName())) {
+                    token = cookie.getValue();
+                    break;
                 }
+            }
+        }
+
+        if (token != null && jwtUtil.validateToken(token)) {
+            String email = jwtUtil.extractEmail(token);
+            User user = userRepository.findByMail(email).orElse(null);
+
+            if (user != null) {
+                List<SimpleGrantedAuthority> authorities = user.getUserRoles().stream()
+                        .map(ur -> new SimpleGrantedAuthority("ROLE_" + ur.getRole().getName()))
+                        .collect(Collectors.toList());
+
+                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(email, null,
+                        authorities);
+
+                SecurityContextHolder.getContext().setAuthentication(auth);
             }
         }
 
