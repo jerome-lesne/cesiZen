@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cesi.cesiZen.dto.LoginRequestDTO;
+import com.cesi.cesiZen.dto.UserResponseDTO;
 import com.cesi.cesiZen.entity.User;
 import com.cesi.cesiZen.repository.UserRepository;
 import com.cesi.cesiZen.service.AuthService;
@@ -52,8 +53,8 @@ public class AuthController {
                 .httpOnly(true)
                 .secure(false) // No https
                 .path("/")
+                .sameSite("Lax")
                 .maxAge(24 * 60 * 60) // 1 day
-                .sameSite("Strict")
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
@@ -70,14 +71,19 @@ public class AuthController {
         String email = authentication.getName();
         User user = userRepository.findByMail(email).orElseThrow();
 
-        return ResponseEntity.ok(Map.of(
-                "userId", user.getId(),
-                "firstName", user.getFirstName(),
-                "name", user.getName(),
-                "mail", user.getMail(),
-                "roles", user.getUserRoles().stream()
-                        .map(r -> r.getRole().getName())
-                        .toList()));
+        UserResponseDTO dto = new UserResponseDTO();
+        dto.setFirstName(user.getFirstName());
+        dto.setName(user.getName());
+        dto.setMail(user.getMail());
+        dto.setAddress(user.getAddress());
+        dto.setCity(user.getCity());
+        dto.setZipCode(user.getZipCode());
+        dto.setBirthday(user.getBirthday());
+        dto.setRoles(user.getUserRoles().stream()
+                .map(ur -> ur.getRole().getName())
+                .toList());
+
+        return ResponseEntity.ok(dto);
     }
 
     @PostMapping("/logout")

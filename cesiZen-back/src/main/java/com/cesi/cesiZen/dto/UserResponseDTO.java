@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
 import jakarta.validation.constraints.*;
 
-public class UserDTO {
+public class UserResponseDTO {
     @NotBlank(message = "User name required")
     private String name;
 
@@ -28,9 +28,6 @@ public class UserDTO {
 
     @Email(message = "invalid email format")
     private String mail;
-
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^\\w\\s]).{12,}$", message = "Password must be at least 12 characters long, with at least one lowercase letter, one uppercase letter, one digit, and one special character")
-    private String password;
 
     private List<String> roles;
 
@@ -88,14 +85,6 @@ public class UserDTO {
 
     public void setMail(String mail) {
         this.mail = mail;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public List<String> getRoles() {

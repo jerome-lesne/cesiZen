@@ -26,6 +26,7 @@ public class JwtUtil {
                 .collect(Collectors.toList());
 
         return Jwts.builder()
+                .setSubject(user.getMail())
                 .claim("userId", user.getId())
                 .claim("firstName", user.getFirstName())
                 .claim("name", user.getName())
