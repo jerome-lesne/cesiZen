@@ -5,6 +5,10 @@ type User = {
     firstName: string;
     name: string;
     mail: string;
+    address: string;
+    city: string;
+    zipCode: string;
+    birthday: string;
     roles: string[];
 };
 

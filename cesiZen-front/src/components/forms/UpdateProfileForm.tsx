@@ -81,12 +81,14 @@ export default function UpdateProfileForm({ initialData, onSubmit, onCancel }: U
         setResult(null);
 
         try {
-            const res = await fetch("http://localhost:8081/users/update-profile", {
+            const res = await fetch("http://localhost:8081/user-auth/update-profile", {
                 method: "PATCH",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
                 body: JSON.stringify(form),
             });
-
             if (res.ok) {
                 setResult("Profil mis à jour avec succès !");
                 onSubmit?.(form);

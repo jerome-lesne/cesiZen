@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ const initialForm = {
 };
 
 export default function RegisterForm() {
+    const navigate = useNavigate()
     const [form, setForm] = useState(initialForm);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [touched, setTouched] = useState<Record<string, boolean>>({});
@@ -100,6 +102,7 @@ export default function RegisterForm() {
                 setResult("Compte créé avec succès !");
                 setForm(initialForm);
                 setTouched({});
+                navigate("/login");
             } else {
                 const errorData = await res.json();
                 setResult("Erreur : " + (errorData.message || "inconnue"));

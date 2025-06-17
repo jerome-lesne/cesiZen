@@ -21,8 +21,7 @@ export default function LoginPage() {
 
         try {
             await login(email, password);
-            console.log("connecté")
-            navigate("/")
+            navigate("/");
         } catch (err) {
             setError("Identifiants invalides");
         } finally {
