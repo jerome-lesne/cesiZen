@@ -14,9 +14,10 @@ type User = {
 
 type AuthContextType = {
     user: User | null;
+    isAuthenticated: boolean;
     login: (mail: string, password: string) => Promise<void>;
     logout: () => void;
-    isAuthenticated: boolean;
+    setUser: React.Dispatch<React.SetStateAction<User | null>>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -26,7 +27,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [loading, setLoading] = useState(true);
     const isAuthenticated = !!user;
 
-    // Check if already logged in (cookie exists)
     useEffect(() => {
         const fetchProfile = async () => {
             try {
@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             } catch (error) {
                 console.error("Error fetching user profile:", error);
             } finally {
-                setLoading(false)
+                setLoading(false);
             }
         };
 
@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ mail, password }),
-            credentials: "include", // send and receive cookies
+            credentials: "include",
         });
 
         if (!response.ok) throw new Error("Authentication failed");
@@ -76,7 +76,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout, isAuthenticated }}>
+        <AuthContext.Provider value={{ user, login, logout, isAuthenticated, setUser }}>
             {children}
         </AuthContext.Provider>
     );

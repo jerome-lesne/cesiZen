@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import UpdateProfileForm from "@/components/forms/UpdateProfileForm";
 import UserProfileCard from "@/components/infoCards/UserProfileCard";
 import ChangePasswordForm from "@/components/forms/ChangePasswordForm";
@@ -6,46 +6,24 @@ import PasswordCard from "@/components/infoCards/PasswordCard";
 import { useAuth } from "@/context/AuthContext";
 
 export default function ProfilePage() {
-    const { user } = useAuth();
+    const { user, setUser } = useAuth();
 
     const [editing, setEditing] = useState(false);
     const [editingPassword, setEditingPassword] = useState(false);
 
-    const [localUser, setLocalUser] = useState(() => ({
-        name: user?.name || "",
-        firstName: user?.firstName || "",
-        birthday: user?.birthday || "",
-        address: user?.address || "",
-        zipCode: user?.zipCode || "",
-        city: user?.city || "",
-        mail: user?.mail || "",
-    }));
+    if (!user) return null; // ou affichage "Chargement..."
 
-    useEffect(() => {
-        if (user) {
-            setLocalUser({
-                name: user.name,
-                firstName: user.firstName,
-                birthday: user.birthday,
-                address: user.address,
-                zipCode: user.zipCode,
-                city: user.city,
-                mail: user.mail,
-            });
-        }
-    }, [user]);
-
-    const handleUpdate = (newData: typeof localUser) => {
-        setLocalUser(newData);
+    const handleUpdate = (newData: Partial<typeof user>) => {
+        setUser(prev => prev ? { ...prev, ...newData } : null);
         setEditing(false);
     };
 
     return (
         <div className="p-4 flex flex-col justify-center items-center gap-4">
             {editing ? (
-                <UpdateProfileForm initialData={localUser} onSubmit={handleUpdate} onCancel={() => setEditing(false)} />
+                <UpdateProfileForm initialData={user} onSubmit={handleUpdate} onCancel={() => setEditing(false)} />
             ) : (
-                <UserProfileCard user={localUser} onEdit={() => setEditing(true)} />
+                <UserProfileCard user={user} onEdit={() => setEditing(true)} />
             )}
             {editingPassword ? (
                 <ChangePasswordForm onSubmit={() => setEditingPassword(false)} onCancel={() => setEditingPassword(false)} />
