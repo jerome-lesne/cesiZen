@@ -10,12 +10,16 @@ type Props = {
 export default function Sidebar({ isMobile = false }: Props) {
     const location = useLocation();
     const navigate = useNavigate();
-    const { isAuthenticated, logout } = useAuth();
+    const { isAuthenticated, logout, loading } = useAuth();
 
     const handleLogout = async () => {
         await logout();
         navigate("/login");
     };
+
+    if (loading) {
+        return null;
+    }
 
     const navItems = [
         { href: "/", label: "Accueil", icon: Home },

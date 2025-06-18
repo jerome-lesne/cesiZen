@@ -11,7 +11,7 @@ export default function ProfilePage() {
     const [editing, setEditing] = useState(false);
     const [editingPassword, setEditingPassword] = useState(false);
 
-    if (!user) return null; // ou affichage "Chargement..."
+    if (!user) return null;
 
     const handleUpdate = (newData: Partial<typeof user>) => {
         setUser(prev => prev ? { ...prev, ...newData } : null);

@@ -18,6 +18,7 @@ type AuthContextType = {
     login: (mail: string, password: string) => Promise<void>;
     logout: () => void;
     setUser: React.Dispatch<React.SetStateAction<User | null>>;
+    loading: boolean;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -76,7 +77,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout, isAuthenticated, setUser }}>
+        <AuthContext.Provider value={{ user, login, logout, isAuthenticated, setUser, loading }}>
             {children}
         </AuthContext.Provider>
     );
