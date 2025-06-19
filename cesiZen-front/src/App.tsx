@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Header from "./components/layout/Header";
 import Sidebar from "./components/layout/Sidebar";
 import Home from "./pages/Home";
@@ -6,6 +6,7 @@ import Register from "./pages/Register";
 import ProfilePage from "./pages/Profile";
 import ProtectedRoute from "./components/util/ProtectedRoute";
 import Login from "./pages/Login";
+import Admin from "./pages/Admin";
 
 function App() {
     return (
@@ -23,6 +24,13 @@ function App() {
                             element={
                                 <ProtectedRoute>
                                     <ProfilePage />
+                                </ProtectedRoute>
+                            } />
+                        <Route
+                            path="/admin"
+                            element={
+                                <ProtectedRoute adminOnly={true}>
+                                    <Admin />
                                 </ProtectedRoute>
                             } />
                     </Routes>
