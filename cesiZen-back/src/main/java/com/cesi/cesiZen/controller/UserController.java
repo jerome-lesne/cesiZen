@@ -35,22 +35,4 @@ public class UserController {
         User user = userService.create(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
-
-    // TODO : Put it in admin-user controller or similar
-
-    // @GetMapping("/")
-    // @Operation(summary = "Get all users", description = "Returns a list of all
-    // users")
-    // public List<User> findAll() {
-    // List<User> usersList = userService.findAll();
-    // return usersList;
-    // }
-
-    // @GetMapping("/{id}")
-    // @Operation(summary = "Get user by id", description = "Ruturns a User")
-    // public User findById(@PathVariable Long id) {
-    // User user = userService.findById(id);
-    // return user;
-    // }
-
 }
