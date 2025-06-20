@@ -73,7 +73,6 @@ public class UserServiceImpl implements UserService {
         if (!userRepository.existsById(id)) {
             throw new IllegalArgumentException("User with id " + id + " not found.");
         }
-
         userRepository.deleteById(id);
     }
 
@@ -110,6 +109,7 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+    @Transactional
     @Override
     public User createUserWithRole(AdminUserDTO dto) {
 

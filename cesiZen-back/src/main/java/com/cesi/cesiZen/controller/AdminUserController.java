@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,7 +29,7 @@ public class AdminUserController {
         this.userService = userService;
     }
 
-    @PostMapping
+    @PostMapping("/create")
     @Operation(summary = "As admin create a new user")
     public ResponseEntity<?> createUser(@RequestBody AdminUserDTO dto) {
         try {
@@ -37,6 +38,13 @@ public class AdminUserController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "As admin delete user")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        userService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/update/{id}")
