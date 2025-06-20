@@ -1,30 +1,15 @@
 import { useEffect, useState } from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Trash2, Edit, Info } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-
-interface User {
-    id: number;
-    firstName: string;
-    name: string;
-    mail: string;
-    address: string;
-    city: string;
-    zipCode: string;
-    birthday: string;
-    roles: string[];
-    password?: string;
-}
-
-interface Role {
-    id: number;
-    name: string;
-}
+import UserTable from "@/components/table/UserTable";
+import UserDialog from "@/components/dialog/UserDialog";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { Pencil, Trash2 } from "lucide-react";
+import { Role, Content, User } from "@/types"
+import ContentDialog from "@/components/dialog/ContentDialog";
 
 export default function Admin() {
     const [users, setUsers] = useState<User[]>([]);
@@ -35,6 +20,11 @@ export default function Admin() {
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [infoDialogOpen, setInfoDialogOpen] = useState(false);
     const [availableRoles, setAvailableRoles] = useState<Role[]>([]);
+
+    const [contents, setContents] = useState<Content[]>([]);
+    const [editingContentId, setEditingContentId] = useState<number | null>(null);
+    const [createContentDialogOpen, setCreateContentDialogOpen] = useState(false);
+    const [formContent, setFormContent] = useState<Content | null>(null);
 
     const fetchUsers = () => {
         setLoading(true);
@@ -60,12 +50,24 @@ export default function Admin() {
                 return res.json();
             })
             .then((data: Role[]) => setAvailableRoles(data))
+            .catch(err => alert(err.message))
+            .finally(() => setLoading(false));
+    };
+
+    const fetchContents = () => {
+        fetch("http://localhost:8081/admin/content", { credentials: "include" })
+            .then(res => {
+                if (!res.ok) throw new Error("Erreur chargement contenus");
+                return res.json();
+            })
+            .then((data: Content[]) => setContents(data))
             .catch(err => alert(err.message));
     };
 
     useEffect(() => {
         fetchUsers();
         fetchRoles();
+        fetchContents();
     }, []);
 
     const handleDelete = async (id: number) => {
@@ -92,7 +94,7 @@ export default function Admin() {
         setInfoDialogOpen(true);
     };
 
-    const handleUpdate = async () => {
+    const handleCreateOrUpdateUser = async () => {
         if (!formUser) return;
         const isNew = formUser.id === 0;
         const url = isNew
@@ -117,107 +119,83 @@ export default function Admin() {
         }
     };
 
+    const handleCreateContent = async () => {
+        const url = "http://localhost:8081/admin/content"
+        const method = "POST"
+        try {
+            const res = await fetch(url, {
+                method,
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify(formContent),
+            })
+            if (!res.ok) throw new Error("Échec de l'enregistrement");
+            setCreateContentDialogOpen(false);
+            fetchContents();
+        } catch (err: any) {
+            alert(err.message);
+        }
+    }
+
+    const handleUpdateContent = async (content: Content) => {
+        const url = `http://localhost:8081/admin/content/${content.id}`;
+        const method = "PATCH";
+        try {
+            const res = await fetch(url, {
+                method,
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify(content),
+            });
+            if (!res.ok) throw new Error("Échec de l'enregistrement du contenu");
+            fetchContents();
+            setEditingContentId(null);
+        } catch (err: any) {
+            alert(err.message);
+        }
+    };
+
+    const handleDeleteContent = async (id: number) => {
+        if (!confirm("Supprimer ce contenu ?")) return;
+        try {
+            const res = await fetch(`http://localhost:8081/admin/content/${id}`, {
+                method: "DELETE",
+                credentials: "include",
+            });
+            if (!res.ok) throw new Error("Suppression échouée");
+            fetchContents();
+        } catch (err: any) {
+            alert(err.message);
+        }
+    };
+
     if (loading) return <div>Chargement...</div>;
     if (error) return <div className="text-red-500">Erreur : {error}</div>;
 
     return (
-        <div className="p-4 space-y-4">
-            <Card className="overflow-x-auto hidden md:block">
-                <CardHeader className="mb-2">
-                    <CardTitle>Gestion des utilisateurs</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <Button className="mb-2" onClick={() => {
-                        setFormUser({
-                            id: 0,
-                            name: "",
-                            firstName: "",
-                            mail: "",
-                            address: "",
-                            city: "",
-                            zipCode: "",
-                            birthday: "",
-                            roles: [],
-                            password: "",
-                        });
-                        setEditDialogOpen(true);
-                    }}>
-                        + Créer un utilisateur
-                    </Button>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>ID</TableHead>
-                                <TableHead>Prénom</TableHead>
-                                <TableHead>Nom</TableHead>
-                                <TableHead>Email</TableHead>
-                                <TableHead>Ville</TableHead>
-                                <TableHead>Rôles</TableHead>
-                                <TableHead>Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {users.map(user => (
-                                <TableRow key={user.id}>
-                                    <TableCell>{user.id}</TableCell>
-                                    <TableCell>{user.firstName}</TableCell>
-                                    <TableCell>{user.name}</TableCell>
-                                    <TableCell>{user.mail}</TableCell>
-                                    <TableCell>{user.city}</TableCell>
-                                    <TableCell className="flex flex-col justify-center gap-1">{user.roles.map((role) => (
-                                        <Badge key={role} variant="outline" className="mr-1">
-                                            {role}
-                                        </Badge>
-                                    ))}</TableCell>
-                                    <TableCell className="space-x-1">
-                                        <Button variant="secondary" size="sm" onClick={() => handleInfo(user)}>
-                                            <Info className="w-4 h-4" />
-                                        </Button>
-                                        <Button variant="outline" size="sm" onClick={() => handleEdit(user)}>
-                                            <Edit className="w-4 h-4" />
-                                        </Button>
-                                        <Button variant="destructive" size="sm" onClick={() => handleDelete(user.id)}>
-                                            <Trash2 className="w-4 h-4" />
-                                        </Button>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </CardContent>
+        <div className="p-4 space-y-6">
+            <UserTable
+                users={users}
+                onInfo={handleInfo}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onCreate={() => {
+                    setFormUser({
+                        id: 0,
+                        name: "",
+                        firstName: "",
+                        mail: "",
+                        address: "",
+                        city: "",
+                        zipCode: "",
+                        birthday: "",
+                        roles: [],
+                        password: "",
+                    });
+                    setEditDialogOpen(true);
+                }}
+            />
 
-            </Card>
-            {/* mobile */}
-            <div className="md:hidden space-y-2">
-                <CardHeader>
-                    <CardTitle>Gestion des utilisateurs</CardTitle>
-                </CardHeader>
-                {users.map(user => (
-                    <Card key={user.id}>
-                        <CardHeader>
-                            <CardTitle>{user.firstName} {user.name}</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-1">
-                            <p><strong>Email:</strong> {user.mail}</p>
-                            <p><strong>Ville:</strong> {user.city}</p>
-                            <p><strong>Rôles:</strong> {user.roles.join(", ")}</p>
-                            <div className="flex gap-2 mt-2">
-                                <Button variant="secondary" size="sm" onClick={() => handleInfo(user)}>
-                                    <Info className="w-4 h-4" />
-                                </Button>
-                                <Button variant="outline" size="sm" onClick={() => handleEdit(user)}>
-                                    <Edit className="w-4 h-4" />
-                                </Button>
-                                <Button variant="destructive" size="sm" onClick={() => handleDelete(user.id)}>
-                                    <Trash2 className="w-4 h-4" />
-                                </Button>
-                            </div>
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
-
-            {/* Modale d'infos */}
             <Dialog open={infoDialogOpen} onOpenChange={setInfoDialogOpen}>
                 <DialogContent>
                     <DialogHeader>
@@ -238,64 +216,104 @@ export default function Admin() {
                 </DialogContent>
             </Dialog>
 
-            {/* Modale d'édition */}
-            <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Modifier l’utilisateur</DialogTitle>
-                    </DialogHeader>
-                    {formUser && (
-                        <form className="space-y-2" onSubmit={e => { e.preventDefault(); handleUpdate(); }}>
-                            {["name", "firstName", "mail", "address", "city", "zipCode", "birthday"].map(field => (
-                                <div key={field}>
-                                    <Label className="capitalize">{field}</Label>
-                                    <Input
-                                        type={field === "birthday" ? "date" : field === "zipCode" ? "number" : "text"}
-                                        value={(formUser as any)[field]}
-                                        onChange={e =>
-                                            setFormUser({ ...formUser, [field]: e.target.value })
-                                        }
-                                    />
-                                </div>
-                            ))}
+            <UserDialog
+                open={editDialogOpen}
+                onOpenChange={setEditDialogOpen}
+                formUser={formUser}
+                setFormUser={setFormUser}
+                availableRoles={availableRoles}
+                onSubmit={handleCreateOrUpdateUser}
+            />
 
-                            <Label>Nouveau mot de passe</Label>
-                            <Input
-                                type="password"
-                                value={formUser.password || ""}
-                                onChange={e => setFormUser({ ...formUser, password: e.target.value })}
-                            />
-                            <div>
-                                <Label>Rôles</Label>
-                                <div className="border rounded-md p-2">
-                                    {availableRoles.map((role) => (
-                                        <div key={role.id} className="flex items-center space-x-2">
-                                            <input
-                                                type="checkbox"
-                                                id={`role-${role.name}`}
-                                                checked={formUser.roles.includes(role.name)}
-                                                onChange={() => {
-                                                    const newRoles = formUser.roles.includes(role.name)
-                                                        ? formUser.roles.filter(r => r !== role.name)
-                                                        : [...formUser.roles, role.name];
-                                                    setFormUser({ ...formUser, roles: newRoles });
+            <Card>
+                <CardHeader>
+                    <CardTitle>Gestion des contenus</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <Button
+                        className="mb-2"
+                        onClick={() => {
+                            setFormContent({
+                                id: 0,
+                                title: "",
+                                content: ""
+                            });
+                            setCreateContentDialogOpen(true);
+                        }}>+ Créer un Contenu</Button>
+                    <div className="space-y-2">
+                        {contents.map(content => (
+                            <div key={content.id} className="border p-2 rounded-md">
+                                {editingContentId === content.id ? (
+                                    <form
+                                        className="space-y-2"
+                                        onSubmit={e => {
+                                            e.preventDefault();
+                                            handleUpdateContent(content);
+                                        }}
+                                    >
+                                        <div>
+                                            <Label>Titre</Label>
+                                            <Input
+                                                value={content.title}
+                                                onChange={e => {
+                                                    const updated = contents.map(c =>
+                                                        c.id === content.id ? { ...c, title: e.target.value } : c
+                                                    );
+                                                    setContents(updated);
                                                 }}
-                                                className="accent-blue-500"
                                             />
-                                            <label htmlFor={`role-${role.name}`}>{role.name}</label>
                                         </div>
-                                    ))}
-                                </div>
+                                        <div>
+                                            <Label>Contenu</Label>
+                                            <Textarea
+                                                rows={5}
+                                                value={content.content}
+                                                onChange={e => {
+                                                    const updated = contents.map(c =>
+                                                        c.id === content.id ? { ...c, content: e.target.value } : c
+                                                    );
+                                                    setContents(updated);
+                                                }}
+                                            />
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <Button type="submit">Mettre à jour</Button>
+                                            <Button type="button" variant="secondary" onClick={() => setEditingContentId(null)}>Annuler</Button>
+                                        </div>
+                                    </form>
+                                ) : (
+                                    <div className="flex justify-between items-start gap-2">
+                                        <div className="flex-1">
+                                            <h4 className="font-semibold">{content.title}</h4>
+                                            <p className="text-sm text-muted-foreground whitespace-pre-line">{content.content}</p>
+                                        </div>
+                                        <div className="flex flex-col gap-2 items-end">
+                                            <Button variant="outline" size="sm" onClick={() => setEditingContentId(content.id)}>
+                                                <Pencil className="w-4 h-4" />
+                                            </Button>
+                                            <Button
+                                                variant="destructive"
+                                                size="sm"
+                                                onClick={() => handleDeleteContent(content.id)}
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
+                        ))}
+                    </div>
+                </CardContent>
+            </Card>
 
-                            <div className="flex justify-end gap-2 mt-4">
-                                <Button variant="secondary" type="button" onClick={() => setEditDialogOpen(false)}>Annuler</Button>
-                                <Button type="submit">Enregistrer</Button>
-                            </div>
-                        </form>
-                    )}
-                </DialogContent>
-            </Dialog>
+            <ContentDialog
+                open={createContentDialogOpen}
+                onOpenChange={setCreateContentDialogOpen}
+                formContent={formContent}
+                setFormContent={setFormContent}
+                onSubmit={handleCreateContent}
+            />
         </div>
     );
 }
