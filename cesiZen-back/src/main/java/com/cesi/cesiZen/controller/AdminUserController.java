@@ -51,8 +51,8 @@ public class AdminUserController {
     @Operation(summary = "As admin update user")
     public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody AdminUserDTO dto) {
         try {
-            User updated = userService.adminUpdateUser(id, dto);
-            return ResponseEntity.ok(updated);
+            userService.adminUpdateUser(id, dto);
+            return ResponseEntity.ok(200);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
