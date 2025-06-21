@@ -44,7 +44,6 @@ export default function ContentDialog({
                         <div key="content">
                             <Label className="capitalize">Contenu</Label>
                             <Textarea
-                                type="text"
                                 onChange={(e) => setFormContent({ ...formContent, content: e.target.value })}
                             />
                         </div>

@@ -21,3 +21,10 @@ export interface Content {
     title: string;
     content: string;
 }
+
+export interface BreathExercise {
+    id: number;
+    inspirationDuration: string;
+    apneaDuration: string;
+    expirationDuration: string;
+}

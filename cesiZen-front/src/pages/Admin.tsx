@@ -1,15 +1,12 @@
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import UserTable from "@/components/table/UserTable";
 import UserDialog from "@/components/dialog/UserDialog";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
-import { Pencil, Trash2 } from "lucide-react";
-import { Role, Content, User } from "@/types"
+import { Role, Content, User, BreathExercise } from "@/types"
 import ContentDialog from "@/components/dialog/ContentDialog";
+import ContentManager from "@/components/table/contentManager";
+import BreathExerciseManager from "@/components/table/BreathExerciseManager";
+import BreathExerciseDialog from "@/components/dialog/BreathDialog";
 
 export default function Admin() {
     const [users, setUsers] = useState<User[]>([]);
@@ -25,6 +22,11 @@ export default function Admin() {
     const [editingContentId, setEditingContentId] = useState<number | null>(null);
     const [createContentDialogOpen, setCreateContentDialogOpen] = useState(false);
     const [formContent, setFormContent] = useState<Content | null>(null);
+
+    const [breathExercises, setBreathExercises] = useState<BreathExercise[]>([]);
+    const [editingBreathId, setEditingBreathId] = useState<number | null>(null);
+    const [formBreath, setFormBreath] = useState<BreathExercise | null>(null);
+    const [createBreathDialogOpen, setCreateBreathDialogOpen] = useState(false);
 
     const fetchUsers = () => {
         setLoading(true);
@@ -64,10 +66,21 @@ export default function Admin() {
             .catch(err => alert(err.message));
     };
 
+    const fetchBreathExercises = () => {
+        fetch("http://localhost:8081/admin/breath-exercise", { credentials: "include" })
+            .then(res => {
+                if (!res.ok) throw new Error("Erreur chargement exercices de réspiration");
+                return res.json()
+            })
+            .then((data: BreathExercise[]) => setBreathExercises(data))
+            .catch(err => alert(err.message));
+    };
+
     useEffect(() => {
         fetchUsers();
         fetchRoles();
         fetchContents();
+        fetchBreathExercises();
     }, []);
 
     const handleDelete = async (id: number) => {
@@ -169,6 +182,46 @@ export default function Admin() {
         }
     };
 
+    const handleCreateBreath = async () => {
+        const res = await fetch("http://localhost:8081/admin/breath-exercise", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify(formBreath),
+        });
+        if (res.ok) {
+            setCreateBreathDialogOpen(false);
+            fetchBreathExercises();
+        } else {
+            alert("Erreur lors de la création");
+        }
+    };
+
+    const handleUpdateBreath = async (breath: BreathExercise) => {
+        const res = await fetch(`http://localhost:8081/admin/breath-exercise/update/${breath.id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify(breath),
+        });
+        if (res.ok) {
+            fetchBreathExercises();
+            setEditingBreathId(null);
+        } else {
+            alert("Erreur lors de la mise à jour");
+        }
+    };
+
+    const handleDeleteBreath = async (id: number) => {
+        if (!confirm("Supprimer cet exercice ?")) return;
+        const res = await fetch(`http://localhost:8081/admin/breath-exercise/delete/${id}`, {
+            method: "DELETE",
+            credentials: "include",
+        });
+        if (res.ok) fetchBreathExercises();
+        else alert("Erreur lors de la suppression");
+    };
+
     if (loading) return <div>Chargement...</div>;
     if (error) return <div className="text-red-500">Erreur : {error}</div>;
 
@@ -225,87 +278,16 @@ export default function Admin() {
                 onSubmit={handleCreateOrUpdateUser}
             />
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>Gestion des contenus</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <Button
-                        className="mb-2"
-                        onClick={() => {
-                            setFormContent({
-                                id: 0,
-                                title: "",
-                                content: ""
-                            });
-                            setCreateContentDialogOpen(true);
-                        }}>+ Créer un Contenu</Button>
-                    <div className="space-y-2">
-                        {contents.map(content => (
-                            <div key={content.id} className="border p-2 rounded-md">
-                                {editingContentId === content.id ? (
-                                    <form
-                                        className="space-y-2"
-                                        onSubmit={e => {
-                                            e.preventDefault();
-                                            handleUpdateContent(content);
-                                        }}
-                                    >
-                                        <div>
-                                            <Label>Titre</Label>
-                                            <Input
-                                                value={content.title}
-                                                onChange={e => {
-                                                    const updated = contents.map(c =>
-                                                        c.id === content.id ? { ...c, title: e.target.value } : c
-                                                    );
-                                                    setContents(updated);
-                                                }}
-                                            />
-                                        </div>
-                                        <div>
-                                            <Label>Contenu</Label>
-                                            <Textarea
-                                                rows={5}
-                                                value={content.content}
-                                                onChange={e => {
-                                                    const updated = contents.map(c =>
-                                                        c.id === content.id ? { ...c, content: e.target.value } : c
-                                                    );
-                                                    setContents(updated);
-                                                }}
-                                            />
-                                        </div>
-                                        <div className="flex gap-2">
-                                            <Button type="submit">Mettre à jour</Button>
-                                            <Button type="button" variant="secondary" onClick={() => setEditingContentId(null)}>Annuler</Button>
-                                        </div>
-                                    </form>
-                                ) : (
-                                    <div className="flex justify-between items-start gap-2">
-                                        <div className="flex-1">
-                                            <h4 className="font-semibold">{content.title}</h4>
-                                            <p className="text-sm text-muted-foreground whitespace-pre-line">{content.content}</p>
-                                        </div>
-                                        <div className="flex flex-col gap-2 items-end">
-                                            <Button variant="outline" size="sm" onClick={() => setEditingContentId(content.id)}>
-                                                <Pencil className="w-4 h-4" />
-                                            </Button>
-                                            <Button
-                                                variant="destructive"
-                                                size="sm"
-                                                onClick={() => handleDeleteContent(content.id)}
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </Button>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                </CardContent>
-            </Card>
+            <ContentManager
+                contents={contents}
+                setContents={setContents}
+                editingContentId={editingContentId}
+                setEditingContentId={setEditingContentId}
+                onSubmit={handleUpdateContent}
+                onDelete={handleDeleteContent}
+                setCreateContentDialogOpen={setCreateContentDialogOpen}
+                setFormContent={setFormContent}
+            />
 
             <ContentDialog
                 open={createContentDialogOpen}
@@ -313,6 +295,26 @@ export default function Admin() {
                 formContent={formContent}
                 setFormContent={setFormContent}
                 onSubmit={handleCreateContent}
+
+            />
+
+            <BreathExerciseManager
+                exercises={breathExercises}
+                setExercises={setBreathExercises}
+                editingBreathId={editingBreathId}
+                setEditingBreathId={setEditingBreathId}
+                onSubmit={handleUpdateBreath}
+                onDelete={handleDeleteBreath}
+                setFormBreath={setFormBreath}
+                setCreateBreathDialogOpen={setCreateBreathDialogOpen}
+            />
+
+            <BreathExerciseDialog
+                open={createBreathDialogOpen}
+                onOpenChange={setCreateBreathDialogOpen}
+                formBreath={formBreath}
+                setFormBreath={setFormBreath}
+                onSubmit={handleCreateBreath}
             />
         </div>
     );
