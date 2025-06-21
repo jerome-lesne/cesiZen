@@ -136,6 +136,7 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
+    @Override
     public List<UserResponseAdminDTO> getAllUsersWithRoles() {
         return userRepository.findAll().stream().map(user -> {
             UserResponseAdminDTO dto = new UserResponseAdminDTO();
