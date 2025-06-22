@@ -5,6 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { BreathExercise } from "@/types";
+import { useAuth } from "@/context/AuthContext";
 
 type Phase = "inspiration" | "apnea" | "expiration" | null;
 
@@ -14,6 +15,7 @@ export default function BreathExercisePage() {
     const [phase, setPhase] = useState<Phase>(null);
     const [timeLeft, setTimeLeft] = useState(0);
     const [running, setRunning] = useState(false);
+    const { user } = useAuth();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -62,6 +64,21 @@ export default function BreathExercisePage() {
         setPhase("inspiration");
         setTimeLeft(parseInt(exercise.inspirationDuration));
         setRunning(true);
+
+        if (user) {
+            console.log("user_id : ", user.id, " ex_id : ", exercise.id)
+            fetch(`http://localhost:8081/user-auth/set-breath-history/${user.id}/${exercise.id}`, {
+                method: "GET",
+                credentials: "include",
+            })
+                .then((res) => {
+                    if (!res.ok) throw new Error("Erreur lors de l’enregistrement de l’historique");
+                    console.log("Historique enregistré !");
+                })
+                .catch((err) => {
+                    console.error(err.message);
+                });
+        }
     };
 
     return (
@@ -77,7 +94,8 @@ export default function BreathExercisePage() {
 
                     {running && (
                         <div className="space-y-2">
-                            <h2 className="text-2xl font-bold capitalize">
+                            <h2 className={`text-6xl font-bold capitalize ${phase !== "apnea" ? "animate-pulse" : ""
+                                }`}>
                                 {(() => {
                                     switch (phase) {
                                         case "inspiration":
@@ -91,7 +109,7 @@ export default function BreathExercisePage() {
                                     }
                                 })()}
                             </h2>
-                            <div className="text-5xl font-mono">{timeLeft}s</div>
+                            <div className="text-8xl font-mono mt-8">{timeLeft}s</div>
                         </div>
                     )}
                 </CardContent>

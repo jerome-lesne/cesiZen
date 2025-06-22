@@ -29,3 +29,8 @@ export interface BreathExercise {
     apneaDuration: string;
     expirationDuration: string;
 }
+
+export interface BreathHistoryItem {
+    date: string;
+    name: string;
+}
