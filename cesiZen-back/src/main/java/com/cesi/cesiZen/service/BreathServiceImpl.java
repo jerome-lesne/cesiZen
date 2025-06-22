@@ -21,6 +21,7 @@ public class BreathServiceImpl implements BreathService {
     public void createBreathExercise(BreathExerciseDTO dto) {
         BreathExercise breathExercise = new BreathExercise();
 
+        breathExercise.setName(dto.getName());
         breathExercise.setInspirationDuration(dto.getInspirationDuration());
         breathExercise.setApneaDuration(dto.getApneaDuration());
         breathExercise.setExpirationDuration(dto.getExpirationDuration());
@@ -33,6 +34,7 @@ public class BreathServiceImpl implements BreathService {
         return breathExerciseRepository.findAll(Sort.by(Sort.Direction.DESC, "id")).stream().map(breath -> {
             BreathExerciseDTO dto = new BreathExerciseDTO();
             dto.setId(breath.getId());
+            dto.setName(breath.getName());
             dto.setInspirationDuration(breath.getInspirationDuration());
             dto.setApneaDuration(breath.getApneaDuration());
             dto.setExpirationDuration(breath.getExpirationDuration());
@@ -44,6 +46,9 @@ public class BreathServiceImpl implements BreathService {
     public void updateBreathExercise(Long id, BreathExerciseDTO dto) {
         BreathExercise breathExercise = breathExerciseRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Exercice de respiration non trouvé"));
+        if (dto.getName() != null) {
+            breathExercise.setName(dto.getName());
+        }
         if (dto.getInspirationDuration() != null) {
             breathExercise.setInspirationDuration(dto.getInspirationDuration());
         }

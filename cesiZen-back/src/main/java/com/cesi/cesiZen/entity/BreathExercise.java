@@ -16,6 +16,9 @@ public class BreathExercise {
     private Long id;
 
     @Column
+    private String name;
+
+    @Column
     private String InspirationDuration;
 
     @Column
@@ -54,5 +57,13 @@ public class BreathExercise {
 
     public void setExpirationDuration(String expirationDuration) {
         ExpirationDuration = expirationDuration;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

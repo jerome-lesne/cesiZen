@@ -7,6 +7,9 @@ public class BreathExerciseDTO {
 
     private Long id;
 
+    @NotBlank(message = "Le nom de l'exercice est obligatoire")
+    private String name;
+
     @NotBlank(message = "La durée d'inspiration est obligatoire")
     @Pattern(regexp = "\\d+", message = "La durée d'inspiration doit contenir uniquement des chiffres")
     private String inspirationDuration;
@@ -49,5 +52,13 @@ public class BreathExerciseDTO {
 
     public void setExpirationDuration(String expirationDuration) {
         this.expirationDuration = expirationDuration;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
