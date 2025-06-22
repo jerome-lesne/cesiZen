@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Home, UserPlus, UserPenIcon, LogIn, LogOut, UserCheck } from "lucide-react";
+import { Home, UserPlus, UserPenIcon, LogIn, LogOut, UserCheck, Activity } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 type Props = {
@@ -24,6 +24,7 @@ export default function Sidebar({ isMobile = false, onLinkClick }: Props) {
 
     const navItems = [
         { href: "/", label: "Accueil", icon: Home },
+        { href: "/breath", label: "Exercice de réspiration", icon: Activity },
         { href: "/register", label: "S'inscrire", icon: UserPlus, guestOnly: true },
         { href: "/login", label: "Se Connecter", icon: LogIn, guestOnly: true },
         { href: "/user-profile", label: "Profile", icon: UserPenIcon, protected: true },

@@ -24,6 +24,7 @@ export interface Content {
 
 export interface BreathExercise {
     id: number;
+    name: string;
     inspirationDuration: string;
     apneaDuration: string;
     expirationDuration: string;

@@ -37,7 +37,7 @@ export default function BreathExerciseManager({
                 <Button
                     className="mb-2"
                     onClick={() => {
-                        setFormBreath({ id: 0, inspirationDuration: "", apneaDuration: "", expirationDuration: "" });
+                        setFormBreath({ id: 0, name: "", inspirationDuration: "", apneaDuration: "", expirationDuration: "" });
                         setCreateBreathDialogOpen(true);
                     }}
                 >
@@ -54,6 +54,18 @@ export default function BreathExerciseManager({
                                         onSubmit(ex);
                                     }}
                                 >
+                                    <div>
+                                        <Label>Nom</Label>
+                                        <Input
+                                            value={ex.name}
+                                            onChange={e => {
+                                                const updated = exercises.map(b =>
+                                                    b.id === ex.id ? { ...b, name: e.target.value } : b
+                                                );
+                                                setExercises(updated);
+                                            }}
+                                        />
+                                    </div>
                                     <div>
                                         <Label>Inspiration</Label>
                                         <Input
@@ -100,6 +112,7 @@ export default function BreathExerciseManager({
                             ) : (
                                 <div className="flex justify-between items-start gap-2">
                                     <div className="flex-1 space-y-1">
+                                        <div><strong>{ex.name}</strong></div>
                                         <div><strong>Inspiration:</strong> {ex.inspirationDuration}</div>
                                         <div><strong>Apnée:</strong> {ex.apneaDuration}</div>
                                         <div><strong>Expiration:</strong> {ex.expirationDuration}</div>

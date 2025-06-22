@@ -34,6 +34,13 @@ export default function BreathExerciseDialog({
                         className="space-y-4"
                     >
                         <div>
+                            <Label>Nom</Label>
+                            <Input
+                                value={formBreath.name}
+                                onChange={e => setFormBreath({ ...formBreath, name: e.target.value })}
+                            />
+                        </div>
+                        <div>
                             <Label>Inspiration</Label>
                             <Input
                                 value={formBreath.inspirationDuration}

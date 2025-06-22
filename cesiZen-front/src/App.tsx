@@ -7,6 +7,8 @@ import ProfilePage from "./pages/Profile";
 import ProtectedRoute from "./components/util/ProtectedRoute";
 import Login from "./pages/Login";
 import Admin from "./pages/Admin";
+import BreathExercisesMenu from "./pages/BreathExercisesMenu";
+import BreathExercises from "./pages/BreathExercises";
 
 function App() {
     return (
@@ -33,6 +35,8 @@ function App() {
                                     <Admin />
                                 </ProtectedRoute>
                             } />
+                        <Route path="/breath" element={<BreathExercisesMenu />} />
+                        <Route path="/breath/:id" element={<BreathExercises />} />
                     </Routes>
                 </main>
             </div>
