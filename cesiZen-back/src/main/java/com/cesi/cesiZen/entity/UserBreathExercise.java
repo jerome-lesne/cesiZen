@@ -1,5 +1,8 @@
 package com.cesi.cesiZen.entity;
 
+import java.time.LocalDateTime;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -17,11 +20,14 @@ public class UserBreathExercise {
     @Column
     private Long id;
 
+    @Column
+    private LocalDateTime date;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "breath_id")
     private BreathExercise breathExercise;
 
@@ -55,5 +61,13 @@ public class UserBreathExercise {
 
     public void setBreathExercise(BreathExercise breathExercise) {
         this.breathExercise = breathExercise;
+    }
+
+    public LocalDateTime getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDateTime date) {
+        this.date = date;
     }
 }

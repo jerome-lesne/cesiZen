@@ -7,6 +7,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import jakarta.validation.constraints.*;
 
 public class UserResponseDTO {
+    @NotBlank
+    private Long id;
+
     @NotBlank(message = "User name required")
     private String name;
 
@@ -95,4 +98,11 @@ public class UserResponseDTO {
         this.roles = roles;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 }

@@ -1,10 +1,6 @@
 package com.cesi.cesiZen.service;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,7 +12,6 @@ import com.cesi.cesiZen.dto.UserUpdateProfileDTO;
 import com.cesi.cesiZen.entity.Role;
 import com.cesi.cesiZen.entity.User;
 import com.cesi.cesiZen.entity.UserRole;
-import com.cesi.cesiZen.mapper.UserMapper;
 import com.cesi.cesiZen.repository.RoleRepository;
 import com.cesi.cesiZen.repository.UserRepository;
 import com.cesi.cesiZen.repository.UserRoleRepository;

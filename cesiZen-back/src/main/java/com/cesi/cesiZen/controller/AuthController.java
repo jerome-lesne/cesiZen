@@ -72,6 +72,7 @@ public class AuthController {
         User user = userRepository.findByMail(email).orElseThrow();
 
         UserResponseDTO dto = new UserResponseDTO();
+        dto.setId(user.getId());
         dto.setFirstName(user.getFirstName());
         dto.setName(user.getName());
         dto.setMail(user.getMail());

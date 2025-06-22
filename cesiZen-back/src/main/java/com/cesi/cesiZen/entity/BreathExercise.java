@@ -1,10 +1,15 @@
 package com.cesi.cesiZen.entity;
 
+import java.util.Set;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -26,6 +31,9 @@ public class BreathExercise {
 
     @Column
     private String ExpirationDuration;
+
+    @OneToMany(mappedBy = "breathExercise", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Set<UserBreathExercise> userBreathExercises;
 
     public Long getId() {
         return id;
@@ -65,5 +73,13 @@ public class BreathExercise {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Set<UserBreathExercise> getUserBreathExercises() {
+        return userBreathExercises;
+    }
+
+    public void setUserBreathExercises(Set<UserBreathExercise> userBreathExercises) {
+        this.userBreathExercises = userBreathExercises;
     }
 }
