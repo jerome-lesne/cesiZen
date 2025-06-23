@@ -94,7 +94,7 @@ export default function BreathExercisePage() {
 
                     {running && (
                         <div className="space-y-2">
-                            <h2 className={`text-6xl font-bold capitalize ${phase !== "apnea" ? "animate-pulse" : ""
+                            <h2 className={`text-4xl sm:text-6xl font-bold capitalize ${phase !== "apnea" ? "animate-pulse" : ""
                                 }`}>
                                 {(() => {
                                     switch (phase) {

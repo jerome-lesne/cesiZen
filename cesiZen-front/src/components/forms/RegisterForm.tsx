@@ -33,8 +33,8 @@ export default function RegisterForm() {
     const validateForm = () => {
         const newErrors: Record<string, string> = {};
 
-        if (!form.name.trim()) newErrors.name = "Le nom est requis.";
-        if (!form.firstName.trim()) newErrors.firstName = "Le prénom est requis.";
+        if (!form.name.trim() || !/.*[a-zA-Z0-9À-ÿ].*/.test(form.name)) newErrors.name = "Le nom est requis.";
+        if (!form.firstName.trim() || !/.*[a-zA-Z0-9À-ÿ].*/.test(form.firstName)) newErrors.firstName = "Le prénom est requis.";
 
         if (!form.birthday) {
             newErrors.birthday = "La date de naissance est requise.";
@@ -44,17 +44,23 @@ export default function RegisterForm() {
 
         if (!form.address.trim()) newErrors.address = "L'adresse est requise.";
 
-        if (!/^\d{5}$/.test(form.zipCode)) {
+        if (!form.zipCode.trim()) {
+            newErrors.zipCode = "Le code postale requis.";
+        } else if (!/^\d{5}$/.test(form.zipCode)) {
             newErrors.zipCode = "Le code postal doit comporter exactement 5 chiffres.";
         }
 
         if (!form.city.trim()) newErrors.city = "La ville est requise.";
 
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.mail)) {
+        if (!form.mail.trim()) {
+            newErrors.mail = "L'email requis.";
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.mail)) {
             newErrors.mail = "Format de courriel invalide.";
         }
 
-        if (
+        if (!form.password.trim()) {
+            newErrors.password = "Le mot de passe est requis.";
+        } else if (
             !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{12,}$/.test(form.password)
         ) {
             newErrors.password =
