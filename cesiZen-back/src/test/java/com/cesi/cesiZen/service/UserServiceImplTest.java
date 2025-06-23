@@ -40,8 +40,8 @@ public class UserServiceImplTest {
         UserDTO dto = new UserDTO();
         dto.setName("Doe");
         dto.setFirstName("John");
-        dto.setCity("Paris");
-        dto.setZipCode(75000);
+        dto.setCity("Coudoux");
+        dto.setZipCode(13111);
         dto.setAddress("1 rue test");
         dto.setMail("john@doe.fr");
         dto.setBirthday(LocalDate.of(1990, 1, 1));
